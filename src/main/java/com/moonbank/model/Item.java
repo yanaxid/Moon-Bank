@@ -1,4 +1,4 @@
-package com.moonbank.moonbank.model;
+package com.moonbank.model;
 
 import java.util.UUID;
 

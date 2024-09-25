@@ -1,10 +1,13 @@
-package com.moonbank.moonbank.util;
+package com.moonbank.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import com.moonbank.moonbank.dto.response.MessageResponse;
+
+import com.moonbank.dto.response.MessageResponse;
+
+
 
 @Component
 public class ResponseUtil {

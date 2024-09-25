@@ -1,4 +1,4 @@
-package com.moonbank.moonbank;
+package com.moonbank;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

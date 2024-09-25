@@ -1,4 +1,4 @@
-package com.moonbank.moonbank.config;
+package com.moonbank.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
