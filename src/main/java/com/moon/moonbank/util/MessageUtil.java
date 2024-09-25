@@ -1,4 +1,4 @@
-package com.moonbank.util;
+package com.moon.moonbank.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

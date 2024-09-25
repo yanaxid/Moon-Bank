@@ -1,4 +1,4 @@
-package com.moonbank.dto.response;
+package com.moon.moonbank.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
