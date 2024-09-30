@@ -4,6 +4,7 @@ import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import io.minio.StatObjectArgs;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +50,13 @@ public class MinioService {
       return input.replaceAll("[^a-zA-Z0-9]", "_");
    }
 
-   private String getFileExtension(String filename) {
+   public String getFileExtension(String filename) {
       int dotIndex = filename.lastIndexOf('.');
       return (dotIndex == -1) ? "" : filename.substring(dotIndex);
    }
 
-   public String uploadFileToMinio(MultipartFile file, String identifier) throws IOException {
-      String sanitizedIdentifier = sanitizeForFilename(identifier);
+   public String uploadFileToMinio(MultipartFile file) throws IOException {
+      String sanitizedIdentifier = sanitizeForFilename(file.getOriginalFilename());
       String timestamp = String.valueOf(System.currentTimeMillis());
       String fileExtension = getFileExtension(file.getOriginalFilename());
 
@@ -94,5 +95,21 @@ public class MinioService {
          throw new Exception("Failed to delete file from MinIO", e);
       }
    }
+
+   public boolean doesFileExist(String filename) {
+        try {
+            minio.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(prop.getBucketName())
+                            .object(filename)
+                            .build()
+            );
+            log.info("File {} exists in MinIO", filename);
+            return true;
+        } catch (Exception e) {
+            log.warn("File {} does not exist in MinIO", filename);
+            return false;
+        }
+    }
 
 }

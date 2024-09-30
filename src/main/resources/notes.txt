@@ -1,0 +1,93 @@
+   // DISPLAY ORDER LIST
+   //with jpa
+   // public ResponseEntity<MessageResponse> getAllOrders() {
+   //    try {
+   //       // Mendapatkan semua detail order
+   //       List<OrderDetailsDTO> detailsDTOs = orderRepository.getOrderDetailsGroupedJPQL();
+
+   //       // Mengisi detail item untuk setiap order
+   //       for (OrderDetailsDTO orderDetails : detailsDTOs) {
+   //          List<ItemQuantityDTO> itemDetails = orderRepository.getItemDetailsByOrderCode(orderDetails.getOrderCode());
+   //          orderDetails.setItemDetails(itemDetails);
+   //       }
+
+   //       return responseUtil.okWithData("ok", detailsDTOs);
+   //    } catch (Exception e) {
+   //       return responseUtil.internalServerError("error.server");
+   //    }
+   // }
+
+
+   
+   // DISPLAY CUSTOMER
+   // public ResponseEntity<MessageResponse> getAllCustomers() {
+
+   //    try {
+   //       List<Customer> customers = customerRepository.findAll();
+
+   //       List<CustomerResponse> customerResponses = new ArrayList<>();
+
+   //       for (Customer c : customers) {
+
+   //          if (c.getIsActive()) {
+   //             customerResponses.add(buildCustomerResponse(c));
+   //          }
+
+   //       }
+
+   //       return responseUtil.okWithData("success.load.data", customerResponses);
+   //    } catch (Exception e) {
+   //       return responseUtil.notFound("error.server");
+   //    }
+   // }
+
+
+
+respon in update order
+
+   // // get total item
+         // Integer totalItem = 0;
+         // Double totalOrderPrice = 0.0;
+         // List<OrderDetailResponse.Item> listItem = new ArrayList<>();
+
+         // for (Order o : updatedOrders) {
+
+         // if (o.getItem().getIsActive()) {
+         // totalItem += 1;
+         // totalOrderPrice += o.getTotalPrice();
+         // listItem.add(
+         // OrderDetailResponse.Item.builder()
+         // .itemId(o.getItem().getItemId())
+         // .itemCode(o.getItem().getItemCode())
+         // .itemName(o.getItem().getItemName())
+         // .price(o.getItem().getPrice())
+         // .pic(o.getItem().getPic())
+         // .picUrl(minioService.getPublicLink(o.getItem().getPic()))
+         // .quantity(o.getQuantity())
+         // .totalItemPrice(o.getQuantity() * o.getItem().getPrice())
+         // .isActive(o.getItem().getIsActive())
+         // .build());
+         // }
+         // }
+
+         // OrderDetailResponse orderDetailResponse = OrderDetailResponse.builder()
+         // .orderCode(updatedOrders.get(0).getOrderCode())
+         // .orderDate(updatedOrders.get(0).getOrderDate())
+         // .totalItem(totalItem)
+         // .customer(
+
+         // OrderDetailResponse.Customer.builder()
+         // .customerId(updatedOrders.get(0).getCustomer().getCustomerId())
+         // .customerCode(updatedOrders.get(0).getCustomer().getCustomerCode())
+         // .customerName(updatedOrders.get(0).getCustomer().getCustomerName())
+         // .customerAddress(updatedOrders.get(0).getCustomer().getCustomerAddress())
+         // .customerPhone(updatedOrders.get(0).getCustomer().getCustomerPhone())
+         // .pic(updatedOrders.get(0).getCustomer().getPic())
+         // .picUrl(minioService.getPublicLink(updatedOrders.get(0).getCustomer().getPic()))
+         // .build())
+         // .createdDate(updatedOrders.get(0).getCreatedDate())
+         // .modifiedDate(updatedOrders.get(0).getModiefiedDate())
+         // .totalOrderPrice(totalOrderPrice)
+         // .items(listItem)
+
+         // .build();

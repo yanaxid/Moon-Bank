@@ -10,11 +10,6 @@ import org.springframework.stereotype.Component;
 import com.moon.moonbank.dto.response.MessageResponse;
 
 
-
-
-
-
-
 @Component
 public class ResponseUtil {
 
@@ -46,6 +41,15 @@ public class ResponseUtil {
 
    public ResponseEntity<MessageResponse> ok(String messageKey) {
       String message = messageUtil.get(messageKey);
+      return ResponseEntity.status(HttpStatus.OK).body(
+            new MessageResponse(
+                  message,
+                  HttpStatus.OK.value(),
+                  HttpStatus.OK.getReasonPhrase()));
+   }
+
+   public ResponseEntity<MessageResponse> okWithAdv(String messageKey, String adv) {
+      String message = messageUtil.get(messageKey, adv);
       return ResponseEntity.status(HttpStatus.OK).body(
             new MessageResponse(
                   message,
@@ -86,10 +90,3 @@ public class ResponseUtil {
    }
 
 }
-
-// @Autowired
-// private ResponseUtil responseUtil;
-
-// public ResponseEntity<MessageResponse> getUser() {
-// return responseUtil.notFound("user.not.found");
-// }
