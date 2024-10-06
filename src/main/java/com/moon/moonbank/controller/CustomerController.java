@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moon.moonbank.dto.request.CustomPageRequest;
 import com.moon.moonbank.dto.request.CustomerRequest;
+import com.moon.moonbank.dto.request.FilterDTO;
 import com.moon.moonbank.dto.response.MessageResponse;
 import com.moon.moonbank.service.CustomerService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,8 +25,8 @@ public class CustomerController {
 
    // DISPLAY CUSTOMER
    @GetMapping("/all-customers")
-   public ResponseEntity<MessageResponse> getAllCustomers(String keyword, CustomPageRequest customPageRequest) {
-      return customerService.getAllCustomers(keyword, customPageRequest.getPage("customer_name.keyword,asc"));
+   public ResponseEntity<MessageResponse> getAllCustomers(FilterDTO filter, CustomPageRequest customPageRequest) {
+      return customerService.getAllCustomers(filter, customPageRequest.getPage("customer_name.keyword,asc"));
    }
 
    // ADD CUSTOMER
@@ -51,6 +52,13 @@ public class CustomerController {
    @GetMapping("/detail-customer/{customerCode}")
    public ResponseEntity<MessageResponse> getCustomer(@PathVariable String customerCode) {
       return customerService.getCustomer(customerCode);
+   }
+
+
+   // REACTIVE CUSTOMER DETAIL
+   @PutMapping("/reactive-customer/{customerCode}")
+   public ResponseEntity<MessageResponse> reactivCustomer(@PathVariable String customerCode) {
+      return customerService.reactiveCustomer(customerCode);
    }
 
 }

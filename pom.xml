@@ -110,6 +110,15 @@
          <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
       </dependency>
 
+
+    <dependency>
+    <groupId>net.sf.jasperreports</groupId>
+    <artifactId>jasperreports</artifactId>
+    <version>6.19.0</version> <!-- Pastikan versi yang digunakan sesuai -->
+</dependency>
+   
+
+
 	</dependencies>
 
 	<build>

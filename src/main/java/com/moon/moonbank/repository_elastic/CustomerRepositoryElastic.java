@@ -20,4 +20,22 @@ public interface CustomerRepositoryElastic extends ElasticsearchRepository<Custo
          """)
    Page<CustomerElastic> searchByKeyword(String keyword, Pageable pageable);
 
+   @Query("""
+         {
+           "bool": {
+             "must": [
+               {"query_string": {
+                 "query": "*?0*",
+                 "default_operator": "AND",
+                 "default_field": "customer_name"
+               }},
+               {"term": {
+                 "is_active": "?1"
+               }}
+             ]
+           }
+         }
+         """)
+   Page<CustomerElastic> searchByKeywordAndStatus(String keyword, Boolean status, Pageable pageable);
+
 }

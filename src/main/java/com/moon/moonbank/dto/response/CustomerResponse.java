@@ -18,6 +18,7 @@ public class CustomerResponse {
    private String customerAddress;
    private String customerPhone;
    private Pic pic;
+   private Boolean isActive;
    private LocalDateTime lastOrderDate;
 
    @Data

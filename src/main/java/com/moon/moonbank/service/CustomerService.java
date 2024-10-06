@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.moon.lib.minio.MinioService;
 import com.moon.moonbank.dto.request.CustomerRequest;
+import com.moon.moonbank.dto.request.FilterDTO;
 import com.moon.moonbank.dto.response.CustomerResponse;
 import com.moon.moonbank.dto.response.MessageResponse;
 import com.moon.moonbank.dto.response.MessageResponse.Meta;
@@ -45,17 +46,25 @@ public class CustomerService {
 
    // DISPLAY CUSTOMER
 
-   public ResponseEntity<MessageResponse> getAllCustomers(String keyword, Pageable pageable) {
+   public ResponseEntity<MessageResponse> getAllCustomers(FilterDTO filter, Pageable pageable) {
 
       // validate keyword
-      String search = keyword;
+      String search = filter.getKeyword();
       if (search == null || search.isEmpty()) {
          search = "";
       }
 
       try {
 
-         Page<CustomerElastic> resultPage = customerRepositoryElastic.searchByKeyword(search, pageable);
+         Page<CustomerElastic> resultPage = null;
+
+         if(filter.getStatus() != null){
+            resultPage = customerRepositoryElastic.searchByKeywordAndStatus(search, filter.getStatus(), pageable);
+
+         }else{
+            resultPage = customerRepositoryElastic.searchByKeyword(search, pageable);
+         }
+
 
          Meta meta = Meta.builder()
                .total(resultPage.getTotalElements())
@@ -65,9 +74,13 @@ public class CustomerService {
                .build();
 
          List<CustomerElastic> modifiedResultPage = resultPage.stream()
-               .filter(result -> result.getIsActive()) // Filter untuk is_active = true
+               // .filter(result -> result.getIsActive()) // Filter untuk is_active = true // tampulkan semua
                .map(result -> {
-                  result.setPicUrl(minioService.getPublicLink(result.getPic())); // Set picUrl dengan public link
+
+                  if(!result.getPic().equalsIgnoreCase("")){
+                     result.setPicUrl(minioService.getPublicLink(result.getPic())); // Set picUrl dengan public link
+                  }
+                  
                   return result;
                })
                .collect(Collectors.toList());
@@ -91,11 +104,19 @@ public class CustomerService {
          return responseUtil.internalServerError("error.server");
       }
 
-      // validate eksistensi of pic
-      Boolean isFileExist = minioService.doesFileExist(request.getPic());
-      if (!isFileExist) {
-         return responseUtil.notFound(request.getPic() + " is not exist");
+      if(request.getPic().length() > 0){
+
+         log.info("------------------------------");
+         // validate eksistensi of pic
+         Boolean isFileExist = minioService.doesFileExist(request.getPic());
+         if (!isFileExist) {
+            return responseUtil.notFound(request.getPic() + "file  is not exist");
+         }
+      }else{
+         log.info("+++++++++");
       }
+
+      
 
       try {
 
@@ -152,6 +173,8 @@ public class CustomerService {
    @Transactional
    public ResponseEntity<MessageResponse> updateCustomer(String customerCode, CustomerRequest request) {
 
+
+
       // validate customerCode
       ResponseEntity<MessageResponse> validateCustomerCodeResult = validateCustomerCode(customerCode);
       if (validateCustomerCodeResult != null) {
@@ -168,7 +191,11 @@ public class CustomerService {
          customer.setCustomerName(request.getCustomerName());
          customer.setCustomerAddress(request.getCustomerAddress());
          customer.setCustomerPhone(request.getCustomerPhone());
-         customer.setPic(request.getPic());
+
+         if(!request.getPic().equalsIgnoreCase("")){
+            customer.setPic(request.getPic());
+         }
+         
 
          CustomerResponse customerResponse = buildCustomerResponse(customer);
 
@@ -239,6 +266,53 @@ public class CustomerService {
 
    }
 
+
+   // DELETE CUSTOMER
+   @Transactional
+   public ResponseEntity<MessageResponse> reactiveCustomer(String customerCode) {
+
+      // validate customerCode
+      ResponseEntity<MessageResponse> validateCustomerCodeResult = validateCustomerCode2(customerCode);
+      if (validateCustomerCodeResult != null) {
+         return validateCustomerCodeResult;
+      }
+
+      try {
+
+         Optional<Customer> customerOpt = customerRepository.findCustomerByCustomerCode(customerCode);
+
+         // remove customer
+         Customer customer = customerOpt.get();
+         customer.setIsActive(true);
+
+         return responseUtil.ok("Customer reactive successfully");
+      } catch (Exception e) {
+         return responseUtil.notFound("error.server");
+      }
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    // VALIDATE CUSTOMER CODE
    private boolean isValidCustomerCode(String customerCode) {
       return customerCode != null && customerCode.startsWith("CUS") && customerCode.length() == 11;
@@ -246,12 +320,19 @@ public class CustomerService {
 
    private CustomerResponse buildCustomerResponse(Customer customer) {
 
+      Pic picObj = null;
+
+      if(!customer.getPic().equalsIgnoreCase("")){
+         picObj = new Pic(customer.getPic(), minioService.getPublicLink(customer.getPic()));
+      }
+
       CustomerResponse customerResponse = CustomerResponse.builder()
             .customerCode(customer.getCustomerCode())
             .customerName(customer.getCustomerName())
             .customerAddress(customer.getCustomerAddress())
             .customerPhone(customer.getCustomerPhone())
-            .pic(new Pic(customer.getPic(), minioService.getPublicLink(customer.getPic())))
+            .isActive(customer.getIsActive())
+            .pic(picObj)
             .lastOrderDate(customer.getLastOrderDate())
             .build();
       return customerResponse;
@@ -272,6 +353,29 @@ public class CustomerService {
          // is item active
          if (!customerOpt.get().getIsActive()) {
             return responseUtil.badRequest("Customer has deleted");
+         }
+
+      } catch (Exception e) {
+         return responseUtil.notFound("error.server");
+      }
+
+      return null; // valid
+
+   }
+
+
+
+   public ResponseEntity<MessageResponse> validateCustomerCode2(String customerCode) {
+
+      if (!isValidCustomerCode(customerCode)) {
+         return responseUtil.badRequest("Invalid Customer Code");
+      }
+
+      try {
+         // is customer exist
+         Optional<Customer> customerOpt = customerRepository.findCustomerByCustomerCode(customerCode);
+         if (customerOpt.isEmpty()) {
+            return responseUtil.notFound("Customer is not exist");
          }
 
       } catch (Exception e) {

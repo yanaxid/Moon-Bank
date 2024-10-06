@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moon.moonbank.dto.request.CustomPageRequest;
+import com.moon.moonbank.dto.request.FilterDTO;
 import com.moon.moonbank.dto.request.ItemRequest;
 import com.moon.moonbank.dto.response.MessageResponse;
 import com.moon.moonbank.service.ItemService;
@@ -29,8 +30,8 @@ public class ItemController {
    // }
 
     @GetMapping("/all-items")
-   public ResponseEntity<MessageResponse> getAllCustomers(String keyword, CustomPageRequest customPageRequest) {
-      return itemService.getAllItems(keyword, customPageRequest.getPage("item_name.keyword,asc"));
+   public ResponseEntity<MessageResponse> getAllCustomers(FilterDTO filter, CustomPageRequest customPageRequest) {
+      return itemService.getAllItems(filter, customPageRequest.getPage("item_name.keyword,asc"));
    }
 
    // ADD ITEM

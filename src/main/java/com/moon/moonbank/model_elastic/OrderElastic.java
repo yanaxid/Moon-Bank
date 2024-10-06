@@ -82,6 +82,11 @@ public class OrderElastic {
    @Builder
    public static class Item {
 
+
+
+      @Field(type = FieldType.Text, name = "order_id")
+      private UUID orderId;
+
       @Field(type = FieldType.Text, name = "item_id")
       private UUID itemId;
 
@@ -102,6 +107,13 @@ public class OrderElastic {
 
       @Field(type = FieldType.Double, name = "total_item_price")
       private Double totalItemPrice;
+
+
+      @Field(type = FieldType.Text, name = "pic")
+      private String pic;
+
+      @Field(type = FieldType.Text, name = "picUrl")
+      private String picUrl;
 
    }
 

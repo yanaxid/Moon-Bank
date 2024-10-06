@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moon.lib.minio.MinioService;
+import com.moon.moonbank.dto.request.FilterDTO;
 import com.moon.moonbank.dto.request.ItemRequest;
+import com.moon.moonbank.dto.response.CustomerResponse.Pic;
 import com.moon.moonbank.dto.response.ItemResponse;
 import com.moon.moonbank.dto.response.MessageResponse;
 import com.moon.moonbank.dto.response.MessageResponse.Meta;
@@ -45,17 +47,29 @@ public class ItemService {
    private MinioService minioService;
 
    // DISPLAY ITEM LIST
-   public ResponseEntity<MessageResponse> getAllItems(String keyword, Pageable pageable) {
+   public ResponseEntity<MessageResponse> getAllItems(FilterDTO filter, Pageable pageable) {
 
       // validate keyword
-      String search = keyword;
+      String search = filter.getKeyword();
       if (search == null || search.isEmpty()) {
          search = "";
       }
 
       try {
 
-         Page<ItemElastic> resultPage = itemRepositoryElastic.searchByKeyword(search, pageable);
+      
+
+          Page<ItemElastic> resultPage = null;
+
+         if(filter.getStatus() != null){
+            resultPage = itemRepositoryElastic.searchByKeywordAndStatus(search, filter.getStatus(), pageable);
+
+         }else{
+            resultPage = itemRepositoryElastic.searchByKeyword(search, pageable);
+         }
+
+
+         
 
          Meta meta = Meta.builder()
                .total(resultPage.getTotalElements())
@@ -65,9 +79,16 @@ public class ItemService {
                .build();
 
          List<ItemElastic> modifiedResultPage = resultPage.stream()
-               .filter(result -> result.getIsActive()) // Filter untuk is_active = true
+               // .filter(result -> result.getIsActive()) // Filter untuk is_active = true
                .map(result -> {
-                  result.setPicUrl(minioService.getPublicLink(result.getPic())); // Set picUrl dengan public link
+
+
+                  if(!result.getPic().equalsIgnoreCase("")){
+                     result.setPicUrl(minioService.getPublicLink(result.getPic())); // Set picUrl dengan public link
+                  }
+
+
+                  // result.setPicUrl(minioService.getPublicLink(result.getPic())); // Set picUrl dengan public link
                   return result;
                })
                .collect(Collectors.toList());
@@ -189,7 +210,12 @@ public class ItemService {
       try {
 
          Optional<ItemElastic> itemOpt = itemRepositoryElastic.findById(itemCode);
-         itemOpt.get().setPicUrl(minioService.getPublicLink(itemOpt.get().getPic()));
+
+         if(!itemOpt.get().getPic().equalsIgnoreCase("")){
+            itemOpt.get().setPicUrl(minioService.getPublicLink(itemOpt.get().getPic()));
+         }
+
+         
 
          return responseUtil.okWithData("success.load.data", itemOpt.get());
       } catch (Exception e) {

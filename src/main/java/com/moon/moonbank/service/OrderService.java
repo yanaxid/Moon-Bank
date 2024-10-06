@@ -88,7 +88,13 @@ public class OrderService {
                .map(result -> {
 
                   // Set URL customer pic
-                  result.getCustomer().setPicUrl(minioService.getPublicLink(result.getCustomer().getPic()));
+                  if (result.getCustomer().getPic() == null || !result.getCustomer().getPic().equalsIgnoreCase("")) {
+
+                     log.info("===============" + result.getCustomer().getPic());
+                     result.getCustomer().setPicUrl(minioService.getPublicLink(result.getCustomer().getPic()));
+                  } else {
+                     result.getCustomer().setPicUrl("");
+                  }
 
                   // Cek apakah semua item memiliki is_active == false
                   boolean allItemsInactive = result.getItems().stream()
@@ -97,10 +103,26 @@ public class OrderService {
                   // Jika semua item inactive, set isOrderActive pada order menjadi false
                   result.setIsOrderActive(!allItemsInactive);
 
-                  // Filter item yang hanya is_active == true
+                  // // Filter item yang hanya is_active == true
+                  // List<OrderElastic.Item> activeItems = result.getItems().stream()
+                  // .filter(OrderElastic.Item::getIsActive) // get item hanya item yang aktif
+                  // .collect(Collectors.toList());
+
                   List<OrderElastic.Item> activeItems = result.getItems().stream()
-                        .filter(OrderElastic.Item::getIsActive) // get item hanya item yang aktif
+                        .filter(OrderElastic.Item::getIsActive) // Hanya ambil item yang aktif
+                        .map(item -> {
+                           if (!item.getPic().equalsIgnoreCase("")) {
+                              item.setPicUrl(minioService.getPublicLink(item.getPic())); // Set picUrl dengan public
+                                                                                         // link dari MinioService
+                           } else {
+                              item.setPicUrl("");
+                           }
+                           return item; // Kembalikan item yang sudah dimodifikasi
+                        })
                         .collect(Collectors.toList());
+
+                  // log.info("==========================");
+                  // log.info(activeItems.toString());
 
                   // Set jumlah item aktif (total_item) ke jumlah dari activeItems
                   result.setTotalItem(activeItems.size());
@@ -192,7 +214,7 @@ public class OrderService {
          orderRepository.saveAll(orders);
          customer.get().setLastOrderDate(orders.get(0).getOrderDate());
 
-         return responseUtil.ok("success.save.data");
+         return responseUtil.okWithData("success.save.data", orders);
       } catch (Exception e) {
          return responseUtil.notFound("error.server");
       }
@@ -338,7 +360,11 @@ public class OrderService {
          orderElastic.ifPresent(result -> {
 
             // Set URL customer pic
-            result.getCustomer().setPicUrl(minioService.getPublicLink(result.getCustomer().getPic()));
+            if (result.getCustomer().getPic() != null && !result.getCustomer().getPic().isEmpty()) {
+               result.getCustomer().setPicUrl(minioService.getPublicLink(result.getCustomer().getPic()));
+            } else {
+               result.getCustomer().setPicUrl("default.jpg");
+            }
 
             // Cek apakah semua item memiliki is_active == false
             boolean allItemsInactive = result.getItems().stream()
@@ -347,9 +373,20 @@ public class OrderService {
             // Jika semua item inactive, set isOrderActive pada order menjadi false
             result.setIsOrderActive(!allItemsInactive);
 
-            // Filter item yang hanya is_active == true
+            // Filter item yang hanya is_active == true dan set picUrl
             List<OrderElastic.Item> activeItems = result.getItems().stream()
-                  .filter(OrderElastic.Item::getIsActive) // get item hanya item yang aktif
+                  .filter(item -> {
+                     if (item.getIsActive()) {
+                        // Set picUrl untuk item yang aktif
+                        if (item.getPic() != null && !item.getPic().isEmpty()) {
+                           item.setPicUrl(minioService.getPublicLink(item.getPic()));
+                        } else {
+                           item.setPicUrl("detault.jpg");
+                        }
+                        return true; // Return true jika item aktif
+                     }
+                     return false; // Return false jika item tidak aktif
+                  })
                   .collect(Collectors.toList());
 
             // Set jumlah item aktif (total_item) ke jumlah dari activeItems
