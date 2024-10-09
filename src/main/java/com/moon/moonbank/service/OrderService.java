@@ -25,7 +25,6 @@ import com.moon.moonbank.dto.response.MessageResponse.Meta;
 import com.moon.moonbank.model.Customer;
 import com.moon.moonbank.model.Item;
 import com.moon.moonbank.model.Order;
-import com.moon.moonbank.model_elastic.CustomerElastic;
 import com.moon.moonbank.model_elastic.OrderElastic;
 import com.moon.moonbank.repository.CustomerRepository;
 import com.moon.moonbank.repository.ItemRepository;

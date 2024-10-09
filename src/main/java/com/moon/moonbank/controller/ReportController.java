@@ -114,9 +114,6 @@ package com.moon.moonbank.controller;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
-import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
-import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -129,7 +126,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moon.lib.minio.MinioService;
 import com.moon.moonbank.model_elastic.OrderElastic;
 import com.moon.moonbank.repository_elastic.OrdersRepositoryElastic;
 import com.moon.moonbank.service.ReportService;
@@ -148,8 +144,6 @@ public class ReportController {
    @Autowired
    private OrdersRepositoryElastic ordersRepositoryElastic;
 
-   @Autowired
-   private MinioService minioService;
 
    @GetMapping("/generate")
 public ResponseEntity<byte[]> generateReport() {

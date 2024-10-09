@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
-import com.moon.moonbank.model_elastic.CustomerElastic;
+
 import com.moon.moonbank.model_elastic.ItemElastic;
 
 public interface ItemRepositoryElastic extends ElasticsearchRepository<ItemElastic, String> {

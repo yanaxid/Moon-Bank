@@ -5,7 +5,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.stereotype.Service;
 
 
-import com.moon.moonbank.model.MyModel;
 import com.moon.moonbank.model_elastic.OrderElastic;
 
 import java.util.HashMap;
