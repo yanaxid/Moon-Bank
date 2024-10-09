@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moon.moonbank.dto.request.CustomPageRequest;
+import com.moon.moonbank.dto.request.FilterDTO;
 import com.moon.moonbank.dto.request.OrderRequest;
 import com.moon.moonbank.dto.request.OrderUpdateRequest;
 import com.moon.moonbank.dto.response.MessageResponse;
@@ -25,8 +26,8 @@ public class OrderController {
 
    // DISPLAY ORDER LIST
    @GetMapping("/all-orders")
-   public ResponseEntity<MessageResponse> getAllOrder(String keyword, CustomPageRequest customPageRequest) {
-      return orderService.getAllOrders(keyword, customPageRequest.getPage("order_date,desc"));
+   public ResponseEntity<MessageResponse> getAllOrder(FilterDTO filter, CustomPageRequest customPageRequest) {
+      return orderService.getAllOrders(filter, customPageRequest.getPage("order_date,desc"));
    }
 
    // ADD ORDER

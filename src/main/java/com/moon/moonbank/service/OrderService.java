@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.moon.lib.minio.MinioService;
+import com.moon.moonbank.dto.request.FilterDTO;
 import com.moon.moonbank.dto.request.OrderRequest;
 import com.moon.moonbank.dto.request.OrderRequest.Items;
 import com.moon.moonbank.dto.request.OrderUpdateRequest;
@@ -24,6 +25,7 @@ import com.moon.moonbank.dto.response.MessageResponse.Meta;
 import com.moon.moonbank.model.Customer;
 import com.moon.moonbank.model.Item;
 import com.moon.moonbank.model.Order;
+import com.moon.moonbank.model_elastic.CustomerElastic;
 import com.moon.moonbank.model_elastic.OrderElastic;
 import com.moon.moonbank.repository.CustomerRepository;
 import com.moon.moonbank.repository.ItemRepository;
@@ -63,16 +65,19 @@ public class OrderService {
 
    // DISPLAY ORDER LIST
    // get with elastic for best performance
-   public ResponseEntity<MessageResponse> getAllOrders(String keyword, Pageable pageable) {
+   public ResponseEntity<MessageResponse> getAllOrders(FilterDTO filter, Pageable pageable) {
 
       // validate keyword
-      String search = keyword;
+      String search = filter.getKeyword();
       if (search == null || search.isEmpty()) {
          search = "";
       }
 
       try {
 
+
+
+      
          Page<OrderElastic> resultPage = ordersRepositoryElastic.searchByKeyword(search, pageable);
 
          log.info(resultPage.getContent().toString());
@@ -137,7 +142,7 @@ public class OrderService {
 
                   return result;
                })
-               .filter(OrderElastic::getIsOrderActive) // Filter hanya order yang aktif
+               // .filter(OrderElastic::getIsOrderActive) // Filter hanya order yang aktif
                .collect(Collectors.toList());
 
          return responseUtil.okWithDataAndMeta("Successfully get data", modifiedResultPage, meta);
